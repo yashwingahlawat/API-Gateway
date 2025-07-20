@@ -18,6 +18,22 @@ const createUser=async(req,res)=>{
     }
 }
 
+const loginUser=async (req,res) => {
+    try {
+        const user=await UserService.signIn({
+            email:req.body.email,
+            password:req.body.password
+        })
+        SuccessResponse.data=user
+        return res.status(StatusCodes.ACCEPTED).json(SuccessResponse)
+    } catch (error) {
+        ErrorResponse.error=error
+        resStatuseCode=error.statusCode?error.statusCode:StatusCodes.INTERNAL_SERVER_ERROR
+        return res.status(resStatuseCode).json(ErrorResponse)
+    }
+}
+
 module.exports={
-    createUser
+    createUser,
+    loginUser
 }

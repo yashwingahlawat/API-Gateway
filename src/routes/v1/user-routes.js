@@ -5,4 +5,6 @@ const router=express.Router()
 
 router.post('/signup',UserMiddleware.validateCreateRequest,UserController.createUser)
 
+router.post('/signin',UserMiddleware.validateCreateRequest,UserController.loginUser)
+
 module.exports=router
