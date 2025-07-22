@@ -33,7 +33,23 @@ const loginUser=async (req,res) => {
     }
 }
 
+const addRoleToUser=async(req,res)=>{
+    try{
+        const user=await UserService.addRoleToUser({
+            id:req.body.id,
+            role:req.body.role
+        })
+        SuccessResponse.data=user
+        return res.status(StatusCodes.CREATED).json(SuccessResponse)
+    }
+    catch(error){
+        ErrorResponse.error=error
+        resStatuseCode=error.statusCode?error.statusCode:StatusCodes.INTERNAL_SERVER_ERROR
+        return res.status(resStatuseCode).json(ErrorResponse)
+    }
+}
 module.exports={
     createUser,
-    loginUser
+    loginUser,
+    addRoleToUser
 }

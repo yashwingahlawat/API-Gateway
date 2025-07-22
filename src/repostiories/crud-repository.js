@@ -5,12 +5,11 @@ class CrudRepository{
     constructor(model){
         this.model=model
     }
-    async create(data){
-        const response=await this.model.create(data)
-        const plainUser = response.get({ plain: true });
-        delete plainUser.password;
-        return plainUser
+    async create(data) {
+        const user = await this.model.create(data);
+        return user; 
     }
+
     async destroy(data){
         const response=await this.model.destroy({
             where:{

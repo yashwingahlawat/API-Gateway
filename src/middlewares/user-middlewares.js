@@ -29,7 +29,23 @@ async function checkAuth(req,res,next) {
     }
 }
 
+async function validateRoleRequest(req,res,next){
+    if(!req.body || !req.body.id){
+        ErrorResponse.message='Something went wrong while creating an booking'
+        ErrorResponse.error=new AppError(["id can't be fount correctly"],StatusCodes.BAD_REQUEST)
+        return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse)
+    }
+    if(!req.body || !req.body.role){
+        ErrorResponse.message='Something went wrong while creating an booking'
+        ErrorResponse.error=new AppError(["role can't be fount correctly"],StatusCodes.BAD_REQUEST)
+        return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse)
+    }
+    next()
+}
+
+validateRoleRequest
 module.exports={
     validateCreateRequest,
-    checkAuth
+    checkAuth,
+    validateRoleRequest
 }

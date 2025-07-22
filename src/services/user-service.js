@@ -1,16 +1,23 @@
 const { StatusCodes } = require('http-status-codes')
-const {UserRepository}=require('../repostiories')
+const {UserRepository,RoleRepository}=require('../repostiories')
 const { AppError } = require("../utils/errors/app-error")
 const {Auth}=require('../utils/common')
+const {Enums}=require('../utils/common')
 
+const {CUSTOMER}=Enums.USER_ROLES_ENUMS
 const userRepository=new UserRepository()
+const roleRepository=new RoleRepository()
 
 const createUser=async (data) => {
     try{
         const user=await userRepository.create(data)
+        const role=await roleRepository.getUserRole(CUSTOMER)
+        console.log(user,role);
+        await user.addRoles(role)
         return user
     }
     catch(error){
+        console.log(error);
         if(error.name=='TypeError'){            
             throw new AppError('Cannot create a new user object',StatusCodes.INTERNAL_SERVER_ERROR)
         }
@@ -61,8 +68,25 @@ const isAuthenticated=async(token)=>{
     }
 }
 
+const addRoleToUser=async (data) => {
+    try {
+        const user=await userRepository.get(data.id)
+        const role=await roleRepository.getUserRole(data.role)
+        if(!user)
+            throw new AppError('Invalid user.',StatusCodes.NOT_FOUND)
+        if(!role)
+            throw new AppError('Invalid role.',StatusCodes.NOT_FOUND)
+        user.addRoles(role)
+        return user
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+}
+
 module.exports={
     createUser,
     signIn,
-    isAuthenticated
+    isAuthenticated,
+    addRoleToUser
 }

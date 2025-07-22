@@ -12,12 +12,12 @@ const limiter=rateLimiter({
     windowMs:2*6*1000,
     max:3
 })
-
+const {User,Role}=require('./models')
 app.use(express.json())
 
 app.use(express.urlencoded({extended:true}))
 
-app.use(limiter)
+// app.use(limiter)
 
 app.use('/fightsService',createProxyMiddleware({target:ServerConfig.FLIGHTS_SERVICE,changeOrigin:true}))
 
@@ -25,7 +25,8 @@ app.use('/bookingsService',createProxyMiddleware({target:ServerConfig.BOOKINGS_S
 
 app.use('/api',apiRoutes)
 
-app.listen(ServerConfig.PORT,()=>{
+app.listen(ServerConfig.PORT,async()=>{
     console.log(`Server running on ${ServerConfig.PORT}`)
+   
     Logger.info(`Successfully started the server`,'root',{})
 })
