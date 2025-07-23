@@ -4,7 +4,7 @@ const { AppError } = require("../utils/errors/app-error")
 const {Auth}=require('../utils/common')
 const {Enums}=require('../utils/common')
 
-const {CUSTOMER}=Enums.USER_ROLES_ENUMS
+const {CUSTOMER,ADMIN}=Enums.USER_ROLES_ENUMS
 const userRepository=new UserRepository()
 const roleRepository=new RoleRepository()
 
@@ -84,9 +84,26 @@ const addRoleToUser=async (data) => {
     }
 }
 
+const isAdmin=async (id) => {
+    try {
+        const user=await userRepository.get(id)
+         if(!user)
+            throw new AppError('Invalid user.',StatusCodes.NOT_FOUND)
+        const adminRole=await roleRepository.getUserRole(ADMIN)
+        if(!adminRole){
+            throw new AppError('Admin role is assigned to the user.',StatusCodes.NOT_FOUND)
+        }
+        return user.hasRoles(adminRole)
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+}
+
 module.exports={
     createUser,
     signIn,
     isAuthenticated,
-    addRoleToUser
+    addRoleToUser,
+    isAdmin
 }

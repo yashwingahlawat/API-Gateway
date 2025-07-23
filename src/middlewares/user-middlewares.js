@@ -43,9 +43,17 @@ async function validateRoleRequest(req,res,next){
     next()
 }
 
+async function isAdmin(req,res,next) {
+    const response=await UserService.isAdmin(req.user)
+    if(!response)
+        return res.status(StatusCodes.UNAUTHORIZED).json({message:'User is not authorized for this request'})
+    next()
+}
+
 validateRoleRequest
 module.exports={
     validateCreateRequest,
     checkAuth,
-    validateRoleRequest
+    validateRoleRequest,
+    isAdmin
 }
