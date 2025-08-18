@@ -7,7 +7,7 @@ const createUser=async(req,res)=>{
         const user=await UserService.createUser({
             email:req.body.email,
             password:req.body.password
-        })
+        },req.isAdmin)
         SuccessResponse.data=user
         return res.status(StatusCodes.CREATED).json(SuccessResponse)
     }
@@ -25,6 +25,12 @@ const loginUser=async (req,res) => {
             password:req.body.password
         })
         SuccessResponse.data=user
+        res.cookie("token", user, {
+            httpOnly: true, // prevents JS access (mitigates XSS)
+            secure: process.env.NODE_ENV === "production", // use https in prod
+            sameSite: "strict",
+            maxAge: 60 * 60 * 1000 // 1h
+        });
         return res.status(StatusCodes.ACCEPTED).json(SuccessResponse)
     } catch (error) {
         ErrorResponse.error=error

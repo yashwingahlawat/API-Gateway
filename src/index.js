@@ -1,5 +1,6 @@
 const express=require('express')
 const rateLimiter=require('express-rate-limit')
+const cookieParser = require('cookie-parser');
 const {createProxyMiddleware}=require('http-proxy-middleware')
 
 const {ServerConfig,Logger}=require('./config')
@@ -10,14 +11,16 @@ const app=express()
 
 const limiter=rateLimiter({
     windowMs:2*6*1000,
-    max:3
+    max:20
 })
-const {User,Role}=require('./models')
+
 app.use(express.json())
 
 app.use(express.urlencoded({extended:true}))
 
-// app.use(limiter)
+app.use(cookieParser());
+
+app.use(limiter)
 
 app.use('/fightsService',createProxyMiddleware({target:ServerConfig.FLIGHTS_SERVICE,changeOrigin:true}))
 

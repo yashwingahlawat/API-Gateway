@@ -3,7 +3,7 @@ const { UserController } = require('../../controllers')
 const { UserMiddleware } = require('../../middlewares')
 const router=express.Router()
 
-router.post('/signup',UserMiddleware.validateCreateRequest,UserController.createUser)
+router.post('/signup',UserMiddleware.validateCreateRequest,UserMiddleware.validateAdminKey,UserController.createUser)
 
 router.post('/signin',UserMiddleware.validateCreateRequest,UserController.loginUser)
 

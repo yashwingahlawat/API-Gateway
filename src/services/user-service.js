@@ -8,10 +8,10 @@ const {CUSTOMER,ADMIN}=Enums.USER_ROLES_ENUMS
 const userRepository=new UserRepository()
 const roleRepository=new RoleRepository()
 
-const createUser=async (data) => {
+const createUser=async (data,isAdmin) => {
     try{
         const user=await userRepository.create(data)
-        const role=await roleRepository.getUserRole(CUSTOMER)
+        const role=await roleRepository.getUserRole(isAdmin?ADMIN:CUSTOMER)
         console.log(user,role);
         await user.addRoles(role)
         return user
@@ -35,15 +35,18 @@ const createUser=async (data) => {
 const signIn=async(data)=>{
     try {
         const user=await userRepository.getUserByEmail(data.email)
+        const roles = user.roles.map(r => r.name);
         if(!user){
             throw new AppError('Invalid email',StatusCodes.BAD_REQUEST)
         }
         const comparePassword=await Auth.validatePassword(data.password,user.password)
         if(!comparePassword)
             throw new AppError('Invalid Password',StatusCodes.BAD_REQUEST)
-        const jwt=Auth.createToken({id:user.id,email:user.email})
+        // console.log(userWithRoles);
+        const jwt=Auth.createToken({id:user.id,email:user.email,roles})
         return jwt
     } catch (error) {
+        console.log(error);
         throw new AppError('Something went wrong',StatusCodes.INTERNAL_SERVER_ERROR)
     }
 }

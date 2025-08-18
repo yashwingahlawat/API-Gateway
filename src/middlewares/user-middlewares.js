@@ -2,6 +2,7 @@ const { StatusCodes } = require("http-status-codes")
 const { ErrorResponse } = require("../utils/common")
 const { AppError } = require("../utils/errors/app-error")
 const { UserService } = require("../services")
+const { ServerConfig } = require('../config');
 
 async function validateCreateRequest(req,res,next){
     if(!req.body || !req.body.email){
@@ -17,9 +18,20 @@ async function validateCreateRequest(req,res,next){
     next()
 }
 
+function validateAdminKey(req, res, next) {
+  const { adminKey } = req.body;
+  if (adminKey && adminKey === ServerConfig.ADMIN_KEY) {
+    req.isAdmin = true; // mark request as admin
+  } else {
+    req.isAdmin = false;
+  }
+  next();
+}
+
+
 async function checkAuth(req,res,next) {
     try {
-        const response=await UserService.isAuthenticated(req.headers['x-access-token'])
+        const response=await UserService.isAuthenticated(req.cookies.token)
         if(response){
             req.user=response
             next()
@@ -50,10 +62,10 @@ async function isAdmin(req,res,next) {
     next()
 }
 
-validateRoleRequest
 module.exports={
     validateCreateRequest,
     checkAuth,
     validateRoleRequest,
-    isAdmin
+    isAdmin,
+    validateAdminKey
 }
