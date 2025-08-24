@@ -58,9 +58,15 @@ const isAuthenticated=async(token)=>{
         }
         const response=await Auth.verifyToken(token)
         const user=await userRepository.get(response.id)
+        const roleNames = (await user.getRoles()).map(r => r.name);
         if(!user)
             throw new AppError(`No user found`,StatusCodes.BAD_REQUEST)
-        return user.id
+        if(!roleNames.length)
+            throw new AppError(`No role has been assigned to the user`,StatusCodes.BAD_REQUEST)
+        return {
+            user:user.id,
+            roles:roleNames
+        }
     } catch (error) {
         if(error.name=='JsonWebTokenError')
             throw new AppError(`Invalid JWT token`,StatusCodes.BAD_REQUEST)

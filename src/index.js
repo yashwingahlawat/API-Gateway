@@ -6,6 +6,7 @@ const {createProxyMiddleware}=require('http-proxy-middleware')
 const {ServerConfig,Logger}=require('./config')
 
 const apiRoutes=require('./routes')
+const { UserMiddleware } = require('./middlewares');
 
 const app=express()
 
@@ -22,9 +23,9 @@ app.use(cookieParser());
 
 app.use(limiter)
 
-app.use('/fightsService',createProxyMiddleware({target:ServerConfig.FLIGHTS_SERVICE,changeOrigin:true}))
+app.use('/fightsService',UserMiddleware.checkAuth,createProxyMiddleware({target:ServerConfig.FLIGHTS_SERVICE,changeOrigin:true}))
 
-app.use('/bookingsService',createProxyMiddleware({target:ServerConfig.BOOKINGS_SERVICE,changeOrigin:true}))
+app.use('/bookingsService',UserMiddleware.checkAuth,createProxyMiddleware({target:ServerConfig.BOOKINGS_SERVICE,changeOrigin:true}))
 
 app.use('/api',apiRoutes)
 

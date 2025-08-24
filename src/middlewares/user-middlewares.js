@@ -31,9 +31,11 @@ function validateAdminKey(req, res, next) {
 
 async function checkAuth(req,res,next) {
     try {
+        console.log('ok')
         const response=await UserService.isAuthenticated(req.cookies.token)
         if(response){
-            req.user=response
+            req.user=response.user
+            req.roles=response.roles
             next()
         }
     } catch (error) {
